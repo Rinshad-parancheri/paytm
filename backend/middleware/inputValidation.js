@@ -10,6 +10,12 @@ const userSchema = z.object({
 const validateInput = (req, res, next) => {
   try {
     userSchema.parse(req.body);
+
+    if (!userSchema.success) {
+      res.status(404).json({
+        err: "invalid input"
+      })
+    }
     next();
   } catch (error) {
     return res.status(400).json({ error: error.errors });
