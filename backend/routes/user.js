@@ -1,6 +1,6 @@
 const { Router, json } = require("express")
 const { validateInput } = require("../middleware/inputValidation")
-const { User } = require("../db/db")
+const { User, Account } = require("../db/db")
 const userRouter = Router()
 const crypto = require("crypto")
 const jwt = require("jsonwebtoken")
@@ -40,11 +40,16 @@ userRouter.post("/signup", validateInput, async (req, res) => {
   })
 
 
-  console.log(user)
+  if (user._id) {
+    Account.create({
+      userId: user._id,
+      balance: Math.random() * 1000
+    })
+  }
 
   if (user._id) {
     res.status(201).json({
-      id: user._id
+      msg: 'account created successfully'
     })
   } else {
     res.status(400).josn({
