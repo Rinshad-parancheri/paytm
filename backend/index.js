@@ -3,8 +3,8 @@ const { mainRouter } = require("./routes")
 
 require('dotenv').config();
 
-app.use(express.json())
 const app = express()
+app.use(express.json())
 
 
 app.use("/app/v1", mainRouter)

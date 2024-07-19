@@ -1,8 +1,8 @@
 const mongoose = require("mongoose")
 
-const dbUrl = process.env.DB_URL
+require('dotenv').config();
 
-mongoose.connect(url)
+mongoose.connect(process.env.DB_URL)
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
@@ -24,13 +24,9 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, 'Password is required'],
-    minlength: [8, 'Password must be at least 8 characters long']
+    minlength: [5, 'Password must be at least 8 characters long']
   },
 })
-
-
-
-const User = mongoose.model("User", userSchema)
 
 const accountSchema = new mongoose.Schema({
   userId: {
@@ -44,6 +40,9 @@ const accountSchema = new mongoose.Schema({
   }
 })
 
+
+
+const User = mongoose.model("User", userSchema)
 
 const Account = mongoose.model("Account", accountSchema)
 

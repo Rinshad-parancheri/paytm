@@ -25,10 +25,11 @@ userRouter.post("/signup", validateInput, async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
   const existingUser = await User.findOne({ email })
 
-  if (existingUser._id) {
+  if (existingUser) {
     res.status(200).json({
       msg: "user Exit with same email"
     })
+    return
   }
   const hashedPassword = await hashPassword(password)
 
@@ -40,7 +41,7 @@ userRouter.post("/signup", validateInput, async (req, res) => {
   })
 
 
-  if (user._id) {
+  if (user) {
     Account.create({
       userId: user._id,
       balance: Math.random() * 1000
@@ -55,6 +56,7 @@ userRouter.post("/signup", validateInput, async (req, res) => {
     res.status(400).josn({
       msg: "server down "
     })
+
 
   }
 })
@@ -95,19 +97,21 @@ userRouter.post("/signin", validateInput, async (req, res) => {
     return
   }
 
-  const userId = existingUser._id
 
   const jwtKey = process.env.JWT_SECRET
+
   if (!jwtKey) {
     console.log("jwtKeyproblem")
   }
-  let payload = existingUser
-  const jwtToken = jwt.sign({
-    payload
-  }, jwtKey)
+
+  let userId = existingUser._id
+
+
+  const token = jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
   res.status(200).json({
-    token: jwtToken
+    msg: "sign in successfully here is your token",
+    token
   })
 
   return
@@ -142,7 +146,7 @@ userRouter.put("/update", verifyJwtToken, async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true, runValidators: true });
 
     if (!updatedUser) {
-      return res.status(404).json({ error: "User not found" });
+      res.status(404).json({ error: "User not found" });
     }
 
     res.status(200).json({

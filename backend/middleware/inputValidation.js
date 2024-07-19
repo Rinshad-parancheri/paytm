@@ -1,20 +1,21 @@
 const z = require("zod");
 
 const userSchema = z.object({
-  firstName: z.string().max(50),
-  lastName: z.string().max(50),
+  firstName: z.string().min(4),
+  lastName: z.string().min(3),
   email: z.string().email(),
-  password: z.string().min(8)
+  password: z.string().min(5)
 });
 
 const validateInput = (req, res, next) => {
   try {
-    userSchema.parse(req.body);
+    let payload = userSchema.safeParse(req.body);
 
-    if (!userSchema.success) {
+    if (!payload.success) {
       res.status(404).json({
         err: "invalid input"
       })
+      return
     }
     next();
   } catch (error) {

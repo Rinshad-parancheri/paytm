@@ -6,17 +6,17 @@ const z = require("zod")
 const mongoose = require("mongoose")
 
 accountRouter.get("/balance", verifyJwtToken, async (req, res) => {
-
+  console.log("hello")
   let userBalance = await Account.findOne({ userId: req.id })
-
   res.status(200).json({
-    balance: userBalance
+    msg: "your balance",
+    balance: userBalance.balance
   })
 })
 
 let transferSchema = z.object({
-  to: z.string(),
-  amount: z.number()
+  idToTransfer: z.string(),
+  amountToSend: z.string()
 })
 
 accountRouter.post("/transfer", verifyJwtToken, async (req, res) => {
@@ -34,33 +34,30 @@ accountRouter.post("/transfer", verifyJwtToken, async (req, res) => {
   session.startTransaction()
 
 
-
-  let account = Account.findOne({
-    userId: idToTransfer
+  let senderAc = Account.findOne({
+    userId: req.id
   }).session(session)
 
-
-  if (!account || account.balance < amountToSend) {
+  if (!senderAc || senderAc.balance < amountToSend) {
     session.abortTransaction()
     res.status(404).json({
       msg: 'invalid account '
     })
   }
 
-
-  let userToTransfer = Account.findOne({
+  let receiverAc = Account.findOne({
     userId: idToTransfer
-  })
+  }).session(session)
 
-  if (!userToTransfer) {
+
+  if (!receiverAc) {
     session.abortTransaction()
     res.status(404).json({
       msg: "user doesn't exist"
     })
   }
-
   await Account.updateOne({ userId: req.id }, { $inc: { balance: -amountToSend } }).session(session)
-  await Account.updateOne({ userId: req.id }, { $inc: { balance: amountToSend } }).session(session)
+  await Account.updateOne({ userId: idToTransfer }, { $inc: { balance: amountToSend } }).session(session)
 
   await session.commitTransaction()
 
