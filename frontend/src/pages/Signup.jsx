@@ -16,8 +16,7 @@ export const Signin = () => {
           <InputBox label={"Email"} placeholder={"dapper948@gmail"}></InputBox>
           <InputBox label={"Password"} placeholder={"2f9f8fl"}></InputBox>
           <Button label={"Sign In"}></Button>
-          <BottomWarning label={"Alreday have an account"} btnText={"Sign in"} to={"/signin"}></BottomWarning>
-        </div>
+          <BottomWarning label={"Alreday have an account"} btnText={"Sign in"} to={"/signin"}></BottomWarning> </div>
       </div>
     </div>
 
