@@ -4,7 +4,7 @@ import { Heading } from "../components/Heading"
 import { InputBox } from "../components/InputBox"
 import { Subheading } from "../components/SubHeading"
 
-export const Signin = () => {
+export const Signup = () => {
   return (
     <div className="bg-slate-300 h-screen">
       <div className="flex flex-col justify-center ">
