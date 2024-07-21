@@ -31,7 +31,7 @@ export const Signin = () => {
               password
             })
 
-            localStorage.setItem("token", response.token)
+            localStorage.setItem("token", response.data.token)
           }}></Button>
           <BottomWarning label={"couldn't find account"} btnText={"Sign up"} to={"/signin"}></BottomWarning>
         </div>
