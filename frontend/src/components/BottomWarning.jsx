@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 
 export const BottomWarning = ({ label, btnText, to }) => {
   return (
-    <div className="py-2 text-sm grid grid-cols-2 place-items-center">
+    <div className="py-2 text-sm flex justify-center items-center">
       <div>
         {label}
       </div>
