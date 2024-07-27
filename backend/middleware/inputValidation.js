@@ -1,6 +1,6 @@
 const z = require("zod");
 
-const userSchema = z.object({
+const signUpSchema = z.object({
   firstName: z.string().min(4),
   lastName: z.string().min(3),
   email: z.string().email(),
@@ -27,7 +27,8 @@ const transferInpuSchema = z.object({
 
 
 const validateSignInInput = (req, res, next) => {
-  const payload = userSchema.safeParse(req.body);
+  const payload = siginSchema.safeParse(req.body);
+  console.log(`hello from the payload${payload}`)
   if (payload.success) {
     req.body = payload.data;
     next();
@@ -41,7 +42,7 @@ const validateSignInInput = (req, res, next) => {
 
 
 const validateSignUpInput = async (req, res, next) => {
-  const payload = siginSchema.safeParse(req.body)
+  const payload = signUpSchema.safeParse(req.body)
   if (payload.success) {
     req.body = payload.data;
     next();
@@ -59,6 +60,6 @@ module.exports = {
   validateSignInInput,
   validateSignUpInput,
   updateSchema,
-  transferInputSchema
+  transferInpuSchema
 }
 

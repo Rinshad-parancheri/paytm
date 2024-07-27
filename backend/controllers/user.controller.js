@@ -25,32 +25,24 @@ const findUserByEmail = async (email) => {
 };
 
 const signUp = async (req, res) => {
-  try {
-    const result = signUpSchema.safeParse(req.body);
-    if (!result.success) {
-      return res.status(STATUS.BAD_REQUEST).json({
-        error: "Invalid input",
-        details: result.error.errors
-      });
-    }
 
-    const { firstName, lastName, email, password } = result.data;
+  const { firstName, lastName, email, password } = req.body
 
-    const existingUser = await findUserByEmail(email);
-    if (existingUser) {
-      return res.status(STATUS.CONFLICT).json({ msg: "User exists with same email" });
-    }
-
-    const hashedPassword = await hashPassword(password);
-    const user = await User.create({ firstName, lastName, email, password: hashedPassword });
-
-    await Account.create({ userId: user._id, balance: Math.round(Math.random() * 200) });
-    return res.status(STATUS.CREATED).json({ msg: 'Account created successfully' });
-  } catch (error) {
-    console.error("Error in signUp: ", error);
-    return res.status(STATUS.INTERNAL_SERVER_ERROR).json({ msg: "Internal server error" });
+  const existingUser = await findUserByEmail(email);
+  if (existingUser) {
+    console.log("existingUser")
+    return res.status(STATUS.CONFLICT).json({ msg: "User exists with same email" });
   }
+
+  const hashedPassword = await hashPassword(password);
+  const user = await User.create({ firstName, lastName, email, password: hashedPassword });
+
+  await Account.create({ userId: user._id, balance: Math.round(Math.random() * 200) });
+  return res.status(STATUS.CREATED).json({ msg: 'Account created successfully' });
+
 };
+
+
 
 const signIn = async (req, res) => {
   try {
