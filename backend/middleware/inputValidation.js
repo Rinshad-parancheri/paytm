@@ -13,6 +13,19 @@ let siginSchema = z.object({
   password: z.string().min(4)
 })
 
+const updateSchema = z.object({
+  firstName: z.string().optional(),
+  secondName: z.string().optional(),
+  email: z.string().email().optional(),
+  password: z.string().min(8)
+})
+
+const transferInpuSchema = z.object({
+  idToTransfer: z.string(),
+  amountToTransfer: z.string()
+})
+
+
 const validateSignInInput = (req, res, next) => {
   const payload = userSchema.safeParse(req.body);
   if (payload.success) {
@@ -40,18 +53,12 @@ const validateSignUpInput = async (req, res, next) => {
   }
 }
 
-const updateSchema = z.object({
-  firstName: z.string().optional(),
-  secondName: z.string().optional(),
-  email: z.string().email().optional(),
-  password: z.string().min(8)
-})
-
 
 
 module.exports = {
   validateSignInInput,
   validateSignUpInput,
-  updateSchema
+  updateSchema,
+  transferInputSchema
 }
 
