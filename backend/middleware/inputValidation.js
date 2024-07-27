@@ -7,20 +7,51 @@ const userSchema = z.object({
   password: z.string().min(5)
 });
 
-const validateInput = (req, res, next) => {
-  try {
-    let payload = userSchema.safeParse(req.body);
 
-    if (!payload.success) {
-      res.status(404).json({
-        err: "invalid input"
-      })
-      return
-    }
+let siginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(4)
+})
+
+const validateSignInInput = (req, res, next) => {
+  const payload = userSchema.safeParse(req.body);
+  if (payload.success) {
+    req.body = payload.data;
     next();
-  } catch (error) {
-    return res.status(400).json({ error: error.errors });
+  } else {
+    res.status(400).json({
+      err: "Invalid input",
+      details: payload.error.errors
+    });
   }
 };
 
-module.exports = { validateInput };
+
+const validateSignUpInput = async (req, res, next) => {
+  const payload = siginSchema.safeParse(req.body)
+  if (payload.success) {
+    req.body = payload.data;
+    next();
+  } else {
+    res.status(400).json({
+      err: "Invalid input",
+      details: payload.error.errors
+    });
+  }
+}
+
+const updateSchema = z.object({
+  firstName: z.string().optional(),
+  secondName: z.string().optional(),
+  email: z.string().email().optional(),
+  password: z.string().min(8)
+})
+
+
+
+module.exports = {
+  validateSignInInput,
+  validateSignUpInput,
+  updateSchema
+}
+
