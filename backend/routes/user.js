@@ -1,122 +1,15 @@
-const { Router, json } = require("express")
-const { validateInput } = require("../middleware/inputValidation")
+const { Router } = require("express")
+const { validateSignUpInput, validateSignInInput } = require("../middleware/inputValidation")
 const { User, Account } = require("../db/db")
 const userRouter = Router()
-const crypto = require("crypto")
-const jwt = require("jsonwebtoken")
 const { verifyJwtToken } = require("../middleware/jwtAuth")
 const z = require("zod")
+const { signUp, signIn } = require("../controllers/user.controller")
 
 
 
-const hashPassword = (password) => {
-  return new Promise((resolve, reject) => {
-    const salt = crypto.randomBytes(16).toString('hex');
-    crypto.scrypt(password, salt, 64, (err, derivedKey) => {
-      if (err) reject(err);
-      resolve(salt + ':' + derivedKey.toString('hex'));
-    });
-  });
-};
-
-
-userRouter.post("/signup", validateInput, async (req, res) => {
-  const body = req.body
-  const { firstName, lastName, email, password } = req.body;
-  const existingUser = await User.findOne({ email })
-
-  if (existingUser) {
-    res.status(200).json({
-      msg: "user Exit with same email"
-    })
-    return
-  }
-  const hashedPassword = await hashPassword(password)
-
-  const user = await User.create({
-    firstName,
-    lastName,
-    email,
-    password: hashedPassword
-  })
-
-
-  if (user) {
-    Account.create({
-      userId: user._id,
-      balance: Math.random() * 1000
-    })
-  }
-
-  if (user._id) {
-    res.status(201).json({
-      msg: 'account created successfully'
-    })
-  } else {
-    res.status(400).josn({
-      msg: "server down "
-    })
-
-
-  }
-})
-
-const verifyHashedPassword = (password, hash) => {
-  return new Promise((resolve, reject) => {
-    const [salt, key] = hash.split(':');
-    crypto.scrypt(password, salt, 64, (err, derivedKey) => {
-      if (err) reject(err);
-      resolve(key === derivedKey.toString('hex'));
-    });
-  });
-};
-
-
-
-userRouter.post("/signin", validateInput, async (req, res) => {
-  const body = req.body
-
-  const existingUser = await User.findOne({ email: body.email })
-
-  if (!existingUser) {
-    res.status(404).json({
-      msg: `invalid credential`
-    })
-
-    return
-  }
-
-  const hashedPassword = existingUser.password
-
-  const validatedPassword = await verifyHashedPassword(body.password, hashedPassword)
-
-  if (!validatedPassword) {
-    res.status(401).json({
-      msg: "Authentication failed"
-    })
-    return
-  }
-
-
-  const jwtKey = process.env.JWT_SECRET
-
-  if (!jwtKey) {
-    console.log("jwtKeyproblem")
-  }
-
-  let userId = existingUser._id
-
-
-  const token = jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-  res.status(200).json({
-    msg: "sign in successfully here is your token",
-    token
-  })
-
-  return
-
-})
+userRouter.post("/signup", validateSignUpInput, signUp)
+userRouter.post("signin", validateSignInInput, signIn)
 
 const updateSchema = z.object({
   firstName: z.string().optional(),
