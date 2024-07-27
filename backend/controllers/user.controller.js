@@ -46,24 +46,17 @@ const signUp = async (req, res) => {
 
 const signIn = async (req, res) => {
   try {
-    const result = signInSchema.safeParse(req.body);
-    if (!result.success) {
-      return res.status(STATUS.BAD_REQUEST).json({
-        error: "Invalid input",
-        details: result.error.errors
-      });
-    }
 
-    const { email, password } = result.data;
+    const { email, password } = req.body;
 
     const existingUser = await findUserByEmail(email);
     if (!existingUser) {
-      return res.status(STATUS.UNAUTHORIZED).json({ msg: "Authentication failed" });
+      return res.status(STATUS.UNAUTHORIZED).json({ msg: "account exist with same email" });
     }
 
     const validPassword = await verifyHashedPassword(password, existingUser.password);
     if (!validPassword) {
-      return res.status(STATUS.UNAUTHORIZED).json({ msg: "Authentication failed" });
+      return res.status(STATUS.UNAUTHORIZED).json({ msg: "Incorrect password" });
     }
 
     const jwtKey = process.env.JWT_SECRET;
@@ -99,7 +92,7 @@ const update = async (req, res) => {
       updateData.password = await hashPassword(updateData.password);
     }
 
-    const userId = req.user._id;
+    const userId = req.userId;
     const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true, runValidators: true });
 
     if (!updatedUser) {
@@ -121,6 +114,7 @@ const update = async (req, res) => {
     });
   }
 }
+
 const updateInBulk = async (req, res) => {
   try {
     const filter = req.query.filter || "";

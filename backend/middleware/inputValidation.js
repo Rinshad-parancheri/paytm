@@ -8,7 +8,7 @@ const signUpSchema = z.object({
 });
 
 
-let siginSchema = z.object({
+const siginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(4)
 })
@@ -28,7 +28,6 @@ const transferInpuSchema = z.object({
 
 const validateSignInInput = (req, res, next) => {
   const payload = siginSchema.safeParse(req.body);
-  console.log(`hello from the payload${payload}`)
   if (payload.success) {
     req.body = payload.data;
     next();

@@ -1,3 +1,5 @@
+const crypto = require("crypto")
+
 const verifyHashedPassword = (password, hash) => {
   return new Promise((resolve, reject) => {
     const [salt, key] = hash.split(':');

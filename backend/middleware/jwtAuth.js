@@ -18,7 +18,7 @@ const verifyJwtToken = (req, res, next) => {
 
     const user = jwt.verify(token, key)
     if (user.userId) {
-      req.id = user.userId
+      req.userId = user.userId
     }
     next()
   } catch (e) {
