@@ -1,15 +1,17 @@
 const { Router } = require("express")
 const { validateSignUpInput, validateSignInInput } = require("../middleware/inputValidation")
 const { User, Account } = require("../db/db")
-const userRouter = Router()
 const { verifyJwtToken } = require("../middleware/jwtAuth")
 const z = require("zod")
 const { signUp, signIn } = require("../controllers/user.controller")
 
+const userRouter = Router()
 
 
 userRouter.post("/signup", validateSignUpInput, signUp)
 userRouter.post("signin", validateSignInInput, signIn)
+userRouter.put("/update", verifyJwtToken, update)
+userRouter.put("/update/bulk", verifyJwtToken, updateInBulk)
 
 const updateSchema = z.object({
   firstName: z.string().optional(),
